@@ -100,7 +100,7 @@ def update_account(id):
     """
     Update one Account
     """
-    app.logger.info("Request to see one Account")
+    app.logger.info("Request to update one Account")
     if not (account := Account.find(id)):
         return "", status.HTTP_404_NOT_FOUND
     data = request.get_json()
@@ -113,7 +113,16 @@ def update_account(id):
 # DELETE AN ACCOUNT
 ######################################################################
 
-# ... place you code here to DELETE an account ...
+@app.route("/accounts/<int:id>", methods=["DELETE"])
+def delete_account(id):
+    """
+    Delete one Account
+    """
+    app.logger.info("Request to delete one Account")
+    if not (account := Account.find(id)):
+        return "", status.HTTP_404_NOT_FOUND
+    account.delete()
+    return "", status.HTTP_204_NO_CONTENT
 
 
 ######################################################################

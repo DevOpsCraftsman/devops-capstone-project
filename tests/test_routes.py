@@ -179,3 +179,13 @@ class TestAccountService(TestCase):
             json={"this": "that"},
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_account(self):
+        account = self._create_accounts(1)[0]
+        resp = self.client.delete(f"{BASE_URL}/{account.id}")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertIsNone(Account.find(account.id))
+
+    def test_delete_unknown_account(self):
+        resp = self.client.delete(f"{BASE_URL}/12")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
