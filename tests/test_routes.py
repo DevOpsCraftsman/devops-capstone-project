@@ -156,3 +156,26 @@ class TestAccountService(TestCase):
     def test_method_not_allowed_on_read_account(self):
         resp = self.client.post(f"{BASE_URL}/12")
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_update_account(self):
+        account = self._create_accounts(1)[0]
+        account_data = account.serialize()
+        account.name = account_data["name"] = account.name + " Junior"
+        resp = self.client.put(
+            f"{BASE_URL}/{account.id}",
+            json=account_data,
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self._check_account_data(account, account_data)
+
+    def test_update_unknown_account(self):
+        resp = self.client.put(f"{BASE_URL}/12")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_with_wrong_data(self):
+        account = self._create_accounts(1)[0]
+        resp = self.client.put(
+            f"{BASE_URL}/{account.id}",
+            json={"this": "that"},
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
