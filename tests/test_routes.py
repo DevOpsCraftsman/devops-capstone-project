@@ -102,11 +102,7 @@ class TestAccountService(TestCase):
 
         # Check the data is correct
         new_account = response.get_json()
-        self.assertEqual(new_account["name"], account.name)
-        self.assertEqual(new_account["email"], account.email)
-        self.assertEqual(new_account["address"], account.address)
-        self.assertEqual(new_account["phone_number"], account.phone_number)
-        self.assertEqual(new_account["date_joined"], str(account.date_joined))
+        self._check_account_data(account, new_account)
 
     def test_bad_request(self):
         """It should not Create an Account when sending the wrong data"""
@@ -134,11 +130,7 @@ class TestAccountService(TestCase):
         self.assertEqual(len(data), 3)
 
         for account, data_account in zip(accounts, data):
-            self.assertEqual(data_account["name"], account.name)
-            self.assertEqual(data_account["email"], account.email)
-            self.assertEqual(data_account["address"], account.address)
-            self.assertEqual(data_account["phone_number"], account.phone_number)
-            self.assertEqual(data_account["date_joined"], str(account.date_joined))
+            self._check_account_data(account, data_account)
 
     def test_read_account(self):
         """It should read one Account"""
@@ -148,12 +140,14 @@ class TestAccountService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         data_account = resp.get_json()
+        self._check_account_data(account, data_account)
 
-        self.assertEqual(data_account["name"], account.name)
-        self.assertEqual(data_account["email"], account.email)
-        self.assertEqual(data_account["address"], account.address)
-        self.assertEqual(data_account["phone_number"], account.phone_number)
-        self.assertEqual(data_account["date_joined"], str(account.date_joined))
+    def _check_account_data(self, account, data):
+        self.assertEqual(data["name"], account.name)
+        self.assertEqual(data["email"], account.email)
+        self.assertEqual(data["address"], account.address)
+        self.assertEqual(data["phone_number"], account.phone_number)
+        self.assertEqual(data["date_joined"], str(account.date_joined))
 
     def test_read_unknown_account(self):
         resp = self.client.get(f"{BASE_URL}/12")
