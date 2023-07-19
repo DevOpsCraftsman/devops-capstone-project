@@ -127,7 +127,7 @@ class TestAccountService(TestCase):
         """It should List all Accounts"""
         accounts = self._create_accounts(3)
         response = self.client.get(BASE_URL)
-        
+
         self.assertEqual(response.status_code, 200)
 
         data = response.get_json()
@@ -139,7 +139,7 @@ class TestAccountService(TestCase):
             self.assertEqual(data_account["address"], account.address)
             self.assertEqual(data_account["phone_number"], account.phone_number)
             self.assertEqual(data_account["date_joined"], str(account.date_joined))
-            
+
     def test_read_account(self):
         """It should read one Account"""
         account = self._create_accounts(1)[0]
@@ -154,3 +154,7 @@ class TestAccountService(TestCase):
         self.assertEqual(data_account["address"], account.address)
         self.assertEqual(data_account["phone_number"], account.phone_number)
         self.assertEqual(data_account["date_joined"], str(account.date_joined))
+
+    def test_method_not_allowed_on_read_account(self):
+        resp = self.client.post(f"{BASE_URL}/12")
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
