@@ -85,7 +85,8 @@ def list_accounts(id):
     Read one Account
     """
     app.logger.info("Request to see one Account")
-    account = Account.find(id)
+    if not (account := Account.find(id)):
+        return "", status.HTTP_404_NOT_FOUND
     return jsonify(account.serialize()), status.HTTP_200_OK
 
 
