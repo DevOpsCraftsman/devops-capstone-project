@@ -62,7 +62,7 @@ def create_accounts():
 ######################################################################
 
 @app.route("/accounts", methods=["GET"])
-def list_accounts():
+def read_account():
     """
     List all existing Accounts
     """
@@ -79,7 +79,15 @@ def list_accounts():
 # READ AN ACCOUNT
 ######################################################################
 
-# ... place you code here to READ an account ...
+@app.route("/accounts/<int:id>", methods=["GET"])
+def list_accounts(id):
+    """
+    Read one Account
+    """
+    app.logger.info("Request to see one Account")
+    if not (account := Account.find(id)):
+        return "", status.HTTP_404_NOT_FOUND
+    return jsonify(account.serialize()), status.HTTP_200_OK
 
 
 ######################################################################
