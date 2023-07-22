@@ -200,8 +200,8 @@ class TestAccountService(TestCase):
             'X-Frame-Options': 'SAMEORIGIN',
             'X-XSS-Protection': '1; mode=block',
             'X-Content-Type-Options': 'nosniff',
-            'Content-Security-Policy': 'default-src \'self\'',
-            # 'Referrer-Policy': 'strict-origin-when-cross-origin',
+            'Content-Security-Policy': 'default-src \'self\'; object-src \'none\'',
+            'Referrer-Policy': 'strict-origin-when-cross-origin',
         }
         for key, value in security_headers.items():
             self.assertEqual(resp.headers.get(key), value)
