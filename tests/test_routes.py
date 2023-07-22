@@ -8,6 +8,8 @@ Test cases can be run with the following:
 import os
 import logging
 from unittest import TestCase
+
+from service import talisman
 from tests.factories import AccountFactory
 from service.common import status  # HTTP Status Codes
 from service.models import db, Account, init_db
@@ -18,6 +20,7 @@ DATABASE_URI = os.getenv(
 )
 
 BASE_URL = "/accounts"
+HTTPS_ENVIRON = {"wsgi.url_scheme": "https"}
 
 
 ######################################################################
@@ -34,6 +37,7 @@ class TestAccountService(TestCase):
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
         init_db(app)
+        talisman.force_https = False
 
     @classmethod
     def tearDownClass(cls):
@@ -189,3 +193,15 @@ class TestAccountService(TestCase):
     def test_delete_unknown_account(self):
         resp = self.client.delete(f"{BASE_URL}/12")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_security_headers(self):
+        resp = self.client.get("/", environ_overrides=HTTPS_ENVIRON)
+        security_headers = {
+            'X-Frame-Options': 'SAMEORIGIN',
+            'X-XSS-Protection': '1; mode=block',
+            'X-Content-Type-Options': 'nosniff',
+            'Content-Security-Policy': 'default-src \'self\'',
+            # 'Referrer-Policy': 'strict-origin-when-cross-origin',
+        }
+        for key, value in security_headers.items():
+            self.assertEqual(resp.headers.get(key), value)
